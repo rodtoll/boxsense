@@ -1,30 +1,33 @@
 __author__ = 'Rod'
 
-import DataFeed
+import DataSink
 import Sensors
+import time
 
-sensor_stuff = Sensors.ApplicationSensorConfig('sudo',
-                                  ['/home/pi/dht_driver/Adafruit-Raspberry-Pi-Python-Code/Adafruit_DHT_Driver/Adafruit_DHT', '22', '4'],
-                                  ['Temp =\\s+([0-9.]+', 'Hum =\\s+([0-9.]+'])
-sensor_stuff_json = sensor_stuff.get_json()
 
-print("Hello world!")
-print(sensor_stuff_json)
 
-sensor_json = r'''{"app_name": "sudo", "parameters": ["/home/pi/dht_driver/Adafruit-Raspberry-Pi-Python-Code/Adafruit_DHT_Driver/Adafruit_DHT", "22", "4"], "results": {"tempc": "Temp =  ([0-9.]+)", "hum": "Hum = ([0-9.]+)"}}'''
+sqlfeedconfig_json = '{"database_name": "test", "table_name": "sensor_readings", "field_map": {"tempc": 1, "hum": 2, "movement": 3}}'
 
-config_json = '{"host": "api.cosm.com", "port": 80, "api_key": "VHEAxSvili9SEOUM-Z3_qUzb1baSAKxkZGJuZlBuOHBJUT0g", ' \
-              '"feed_id": 127990, "feeds":{"hum": "humidity", "tempc":"temperature_c"}}'
+motion_sensor_json = '{"pin_id":18, "no_movement_timeout_s": 6, "result_name":"movement"}'
 
-feed = DataFeed.datafeed_create_feed(2, config_json)
+sqlfeed = DataSink.datasink_create(1, sqlfeedconfig_json)
+feed = DataSink.datasink_create(2, config_json)
+feed_isy = DataSink.datasink_create(3, isyfeedconfig_json)
 
-sensor = Sensors.sensor_create(2, sensor_json)
+sensor = Sensors.sensor_create(2, 1, sensor_json)
+sensor2 = Sensors.sensor_create(1, 2, motion_sensor_json)
 
-points = sensor.get_datapoints()
+while True:
+    points = sensor.get_datapoints()
+    points.update(sensor2.get_datapoints())
 
-for key, value in points.items():
-    print("Key:" +str(key) + "Value: " + str(value))
+    for key, value in points.items():
+        print("Key:" +str(key) + "Value: " + str(value))
 
-feed.upload_datapoints(points)
+    feed.upload_datapoints(sensor, points)
+    feed_isy.upload_datapoints(sensor, points)
+    sqlfeed.upload_datapoints(sensor, points)
+
+    time.sleep(3)
 
 
