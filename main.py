@@ -1,31 +1,27 @@
 __author__ = 'Rod'
 
-import DataSink
-import Sensors
+import sensordatastore
+import datasinkstore
 import time
 import mysql.connector
 
+print("Starting up..")
+
 connection = mysql.connector.connect(user='', password='', host='127.0.0.1', database='test')
 
-cursor = connection.cursor()
-cursor.execute('SELECT * from sensors')
-sensors = [Sensors.sensor_create(sensor_type, id, config) for id, sensor_type, config in cursor]
-cursor.close()
+sensor_ds = sensordatastore.SensorDataStore()
+sensors = sensor_ds.get_sensors()
 
-cursor = connection.cursor()
-cursor.execute('SELECT * from feeds')
-feeds = [DataSink.datasink_create(feed_type, config) for id, feed_type, config in cursor]
-cursor.close()
-
+sink_ds = datasinkstore.DataSinkStore()
+sinks = sink_ds.get_sinks()
 
 while True:
-
     # read out the current data points
     for sensor in sensors:
         points_to_upload = sensor.get_datapoints()
-        for feed in feeds:
-            print("Feed: " + str(type(feed)))
-            feed.upload_datapoints(sensor, points_to_upload)
+        for sink in sinks:
+            print("Feed: " + str(type(sink)))
+            sink.upload_datapoints(sensor, points_to_upload)
 
     time.sleep(3)
 
