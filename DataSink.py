@@ -10,7 +10,7 @@ class DataSink:
     def __init__(self, json_config):
         self.config = self.json_to_config(json_config)
 
-    def upload_datapoints(self, sensor, data_points):
+    def upload_datapoints(self, current_time, sensor, data_points):
         None
 
     def json_to_config(self, json_config):
@@ -38,8 +38,7 @@ class CosmDataSink(DataSink):
         fields = decoder.decode(json_config)
         return CosmConfig(fields['host'], fields['port'], fields['api_key'], fields['feed_id'], fields['feeds'])
 
-    def upload_datapoints(self, sensor, data_points):
-        current_time = datetime.datetime.utcnow()
+    def upload_datapoints(self, current_time, sensor, data_points):
         headers = {"X-ApiKey" : self.config.api_key}
         for data_key, data_value in data_points.items():
             if data_value is not None:
@@ -73,7 +72,7 @@ class ISYDataSink(DataSink):
         fields = decoder.decode(json_config)
         return ISYConfig(fields['address'], fields['username'], fields['password'], fields['variables'])
 
-    def upload_datapoints(self, sensor, data_points):
+    def upload_datapoints(self, current_time, sensor, data_points):
         for key, value in data_points.items():
             if value is not None:
                 if self.config.variables.has_key(key):
@@ -103,8 +102,7 @@ class MySqlDataSink(DataSink):
         fields = decoder.decode(json_config)
         return MySqlDataSinkConfig(fields['database_name'], fields['table_name'], fields['field_map'])
 
-    def upload_datapoints(self, sensor, data_points):
-        current_time = datetime.datetime.utcnow()
+    def upload_datapoints(self, current_time, sensor, data_points):
         for key, value in data_points.items():
             if value is not None:
                 if self.config.field_map.has_key(key):

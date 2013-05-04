@@ -73,7 +73,6 @@ class MotionSensor(Sensor):
         io.add_event_callback(self.config.pin_id, self.motion_detected)
 
     def motion_detected(self, channel):
-        print("State changed!")
         self.last_delta = time.time()
 
     def json_to_config(self, json_config):
@@ -83,7 +82,6 @@ class MotionSensor(Sensor):
 
     def get_datapoints(self):
         time_delta = time.time() - self.last_delta
-        print("Delta is: "+str(time_delta))
         if time_delta < self.config.no_movement_timeout_s or time_delta <= 0:
             movement_detected = 1
         else:
