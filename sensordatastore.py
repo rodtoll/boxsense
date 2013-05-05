@@ -4,8 +4,8 @@ import mysql.connector
 import Sensors
 
 class SensorDataStore:
-    def __init__(self, db_name='test'):
-        self.connection = mysql.connector.connect(user='', password='', host='127.0.0.1', database=db_name)
+    def __init__(self, db_name='sensor'):
+        self.connection = mysql.connector.connect(user='root', password='Alpha1Romero', host='127.0.0.1', database=db_name)
 
     def get_sensors(self):
         cursor = self.connection.cursor()

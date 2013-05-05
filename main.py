@@ -12,8 +12,6 @@ print("Starting up..")
 
 display = lcd.LCD()
 
-connection = mysql.connector.connect(user='', password='', host='127.0.0.1', database='test')
-
 sensor_ds = sensordatastore.SensorDataStore()
 sensors = sensor_ds.get_sensors()
 

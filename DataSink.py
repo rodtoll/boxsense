@@ -95,7 +95,7 @@ class ISYConfig:
 class MySqlDataSink(DataSink):
     def __init__(self, json_config):
         DataSink.__init__(self, json_config)
-        self.connection = mysql.connector.connect(user='', password='', host='127.0.0.1', database='test')
+        self.connection = mysql.connector.connect(user='root', password='Alpha1Romero', host='127.0.0.1', database='sensor')
 
     def json_to_config(self, json_config):
         decoder = json.JSONDecoder()
