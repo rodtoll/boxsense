@@ -30,7 +30,6 @@ class CosmDataSink(DataSink):
                        str(self.config.feeds[data_key]) + "/datapoints"
             return cosm_uri
         else:
-            print("No mapping found for data item: " + data_key)
             return None
 
     def json_to_config(self, json_config):
@@ -48,7 +47,8 @@ class CosmDataSink(DataSink):
                     request_body = '{ "datapoints":[{"at":"' + self.datetime_to_utc_str(current_time) + '","value":"' + str(data_value) + '"}]}'
                     connection.request("POST", request_uri, request_body, headers)
                     response = connection.getresponse()
-                    print("Status is: " + str(response.status) + " Reason: " + str(response.reason))
+                    if response.status != 200:
+                        print("Status is: " + str(response.status) + " Reason: " + str(response.reason))
 
 class CosmConfig:
     def __init__(self, host, port, api_key, feed_id, feeds):
@@ -78,8 +78,6 @@ class ISYDataSink(DataSink):
                 if self.config.variables.has_key(key):
                     isy_variable_name = self.config.variables[key]
                     self.isy.var_set_value(isy_variable_name, value)
-                else:
-                    print("Unknown variable: key: "+str(key))
 
 class ISYConfig:
     def __init__(self, address, username, password, variables):
@@ -110,8 +108,6 @@ class MySqlDataSink(DataSink):
                     cursor.execute("INSERT INTO "+self.config.table_name+"(sensor_id, field_id, timestamp, reading) VALUES (%s, %s, %s, %s)",
                         (sensor.id, self.config.field_map[key], self.datetime_to_utc_str(current_time), value))
                     cursor.close()
-                else:
-                    print("Unknown variable: key: "+str(key))
 
 class MySqlDataSinkConfig:
     def __init__(self, database_name, table_name, field_map):
